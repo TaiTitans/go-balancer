@@ -1,0 +1,84 @@
+services:
+  backend1:
+    build:
+      context: .
+      dockerfile: examples/backend-server/Dockerfile
+    container_name: backend-1
+    ports:
+      - "8081:8081"
+    command: ["-port", "8081", "-name", "Backend-1"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - loadbalancer-network
+
+  backend2:
+    build:
+      context: .
+      dockerfile: examples/backend-server/Dockerfile
+    container_name: backend-2
+    ports:
+      - "8082:8082"
+    command: ["-port", "8082", "-name", "Backend-2"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - loadbalancer-network
+
+  backend3:
+    build:
+      context: .
+      dockerfile: examples/backend-server/Dockerfile
+    container_name: backend-3
+    ports:
+      - "8083:8083"
+    command: ["-port", "8083", "-name", "Backend-3"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - loadbalancer-network
+
+  loadbalancer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-loadbalancer
+    ports:
+      - "8080:8080"
+    command:
+      - "-port"
+      - "8080"
+      - "-backends"
+      - "http://backend1:8081,http://backend2:8082,http://backend3:8083"
+      - "-strategy"
+      - "roundrobin"
+      - "-health-interval"
+      - "10s"
+      - "-health-timeout"
+      - "5s"
+    depends_on:
+      backend1:
+        condition: service_healthy
+      backend2:
+        condition: service_healthy
+      backend3:
+        condition: service_healthy
+    networks:
+      - loadbalancer-network
+    restart: unless-stopped
+
+networks:
+  loadbalancer-network:
+    driver: bridge

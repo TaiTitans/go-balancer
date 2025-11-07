@@ -42,12 +42,12 @@ func TestNewBackend(t *testing.T) {
 
 func TestBackend_SetAlive(t *testing.T) {
 	backend, _ := NewBackend("http://localhost:8080")
-	
+
 	backend.SetAlive(false)
 	if backend.IsAlive() {
 		t.Error("SetAlive(false) did not set backend to not alive")
 	}
-	
+
 	backend.SetAlive(true)
 	if !backend.IsAlive() {
 		t.Error("SetAlive(true) did not set backend to alive")
@@ -56,21 +56,21 @@ func TestBackend_SetAlive(t *testing.T) {
 
 func TestBackend_Connections(t *testing.T) {
 	backend, _ := NewBackend("http://localhost:8080")
-	
+
 	if backend.GetConnections() != 0 {
 		t.Errorf("Initial connections should be 0, got %d", backend.GetConnections())
 	}
-	
+
 	backend.IncrementConnections()
 	if backend.GetConnections() != 1 {
 		t.Errorf("After increment, connections should be 1, got %d", backend.GetConnections())
 	}
-	
+
 	backend.DecrementConnections()
 	if backend.GetConnections() != 0 {
 		t.Errorf("After decrement, connections should be 0, got %d", backend.GetConnections())
 	}
-	
+
 	// Test that decrement doesn't go below 0
 	backend.DecrementConnections()
 	if backend.GetConnections() != 0 {
@@ -80,10 +80,10 @@ func TestBackend_Connections(t *testing.T) {
 
 func TestBackend_ResponseTime(t *testing.T) {
 	backend, _ := NewBackend("http://localhost:8080")
-	
+
 	testDuration := 100 * time.Millisecond
 	backend.UpdateResponseTime(testDuration)
-	
+
 	if backend.GetResponseTime() != testDuration {
 		t.Errorf("Expected response time %v, got %v", testDuration, backend.GetResponseTime())
 	}

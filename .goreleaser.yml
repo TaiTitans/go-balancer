@@ -1,0 +1,149 @@
+# GoReleaser configuration
+project_name: go-balancer
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: go-balancer
+    main: ./cmd/main.go
+    binary: go-balancer
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+      - config.example.json
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug Fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: 'Performance Improvements'
+      regexp: "^.*perf[(\\w)]*:+.*$"
+      order: 2
+    - title: 'Refactors'
+      regexp: "^.*refactor[(\\w)]*:+.*$"
+      order: 3
+    - title: 'Documentation'
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 4
+    - title: Other
+      order: 999
+
+dockers:
+  - image_templates:
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:latest-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+
+  - image_templates:
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}-arm64"
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:latest-arm64"
+    use: buildx
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+
+docker_manifests:
+  - name_template: "{{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}"
+    image_templates:
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}-arm64"
+
+  - name_template: "{{ .Env.DOCKER_USERNAME }}/go-balancer:latest"
+    image_templates:
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:latest-amd64"
+      - "{{ .Env.DOCKER_USERNAME }}/go-balancer:latest-arm64"
+
+release:
+  github:
+    owner: TaiTitans
+    name: go-balancer
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  footer: |
+    ## Installation
+    
+    ### Binary
+    Download the appropriate binary for your OS from the assets below.
+    
+    ### Docker
+    ```bash
+    docker pull {{ .Env.DOCKER_USERNAME }}/go-balancer:{{ .Version }}
+    ```
+    
+    ### Go Install
+    ```bash
+    go install github.com/TaiTitans/go-balancer/cmd@{{ .Version }}
+    ```
