@@ -23,7 +23,7 @@ func (rr *RoundRobin) SelectBackend(backends []*backend.Backend) *backend.Backen
 	}
 
 	// Find alive backends
-	var aliveBackends []*backend.Backend
+	aliveBackends := []*backend.Backend{}
 	for _, b := range backends {
 		if b.IsAlive() {
 			aliveBackends = append(aliveBackends, b)
@@ -41,5 +41,5 @@ func (rr *RoundRobin) SelectBackend(backends []*backend.Backend) *backend.Backen
 
 // Name returns the strategy name
 func (rr *RoundRobin) Name() string {
-	return "RoundRobin"
+	return RoundRobinStrategy
 }

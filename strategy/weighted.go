@@ -31,7 +31,7 @@ func (wrr *WeightedRoundRobin) SelectBackend(backends []*backend.Backend) *backe
 	}
 
 	// Find alive backends with weights
-	var weightedBackends []*backend.Backend
+	weightedBackends := []*backend.Backend{}
 	totalWeight := 0
 
 	for _, b := range backends {
@@ -60,7 +60,7 @@ func (wrr *WeightedRoundRobin) SelectBackend(backends []*backend.Backend) *backe
 
 // Name returns the strategy name
 func (wrr *WeightedRoundRobin) Name() string {
-	return "WeightedRoundRobin"
+	return WeightedRoundRobinStrategy
 }
 
 // IPHash implements IP hash load balancing strategy
@@ -79,7 +79,7 @@ func (ih *IPHash) SelectBackend(backends []*backend.Backend) *backend.Backend {
 		return nil
 	}
 
-	var aliveBackends []*backend.Backend
+	aliveBackends := []*backend.Backend{}
 	for _, b := range backends {
 		if b.IsAlive() {
 			aliveBackends = append(aliveBackends, b)
@@ -97,5 +97,5 @@ func (ih *IPHash) SelectBackend(backends []*backend.Backend) *backend.Backend {
 
 // Name returns the strategy name
 func (ih *IPHash) Name() string {
-	return "IPHash"
+	return IPHashStrategy
 }

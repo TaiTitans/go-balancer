@@ -18,7 +18,7 @@ func (lc *LeastConnections) SelectBackend(backends []*backend.Backend) *backend.
 		return nil
 	}
 
-	var selected *backend.Backend
+	selected := &backend.Backend{}
 	minConnections := -1
 
 	for _, b := range backends {
@@ -38,5 +38,5 @@ func (lc *LeastConnections) SelectBackend(backends []*backend.Backend) *backend.
 
 // Name returns the strategy name
 func (lc *LeastConnections) Name() string {
-	return "LeastConnections"
+	return LeastConnectionsStrategy
 }

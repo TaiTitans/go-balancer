@@ -26,7 +26,7 @@ func (r *Random) SelectBackend(backends []*backend.Backend) *backend.Backend {
 	}
 
 	// Find alive backends
-	var aliveBackends []*backend.Backend
+	aliveBackends := []*backend.Backend{}
 	for _, b := range backends {
 		if b.IsAlive() {
 			aliveBackends = append(aliveBackends, b)
@@ -44,5 +44,5 @@ func (r *Random) SelectBackend(backends []*backend.Backend) *backend.Backend {
 
 // Name returns the strategy name
 func (r *Random) Name() string {
-	return "Random"
+	return RandomStrategy
 }
