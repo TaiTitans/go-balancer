@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/TaiTitans/go-balancer/balancer"
+	constants "github.com/TaiTitans/go-balancer/const"
 	"github.com/TaiTitans/go-balancer/middleware"
 	"github.com/TaiTitans/go-balancer/strategy"
 )
@@ -37,11 +38,11 @@ func main() {
 	// Select strategy
 	var strat strategy.Strategy
 	switch strings.ToLower(*strategyFlag) {
-	case "roundrobin":
+	case constants.RoundRobinStrategy:
 		strat = strategy.NewRoundRobin()
-	case "leastconnections":
+	case constants.LeastConnectionsStrategy:
 		strat = strategy.NewLeastConnections()
-	case "random":
+	case constants.RandomStrategy:
 		strat = strategy.NewRandom()
 	default:
 		log.Fatalf("Unknown strategy: %s", *strategyFlag)

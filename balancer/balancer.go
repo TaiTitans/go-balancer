@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/TaiTitans/go-balancer/backend"
+	constants "github.com/TaiTitans/go-balancer/const"
 	"github.com/TaiTitans/go-balancer/healthcheck"
 	"github.com/TaiTitans/go-balancer/strategy"
 )
@@ -40,12 +41,6 @@ type Config struct {
 	HealthCheckTimeout  time.Duration
 }
 
-// DefaultConfig provides default configuration values
-const (
-	DefaultHealthCheckInterval = 10 * time.Second
-	DefaultHealthCheckTimeout  = 5 * time.Second
-)
-
 // NewLoadBalancer creates a new load balancer instance
 func NewLoadBalancer(config Config) (*LoadBalancer, error) {
 	if len(config.BackendURLs) == 0 {
@@ -58,10 +53,10 @@ func NewLoadBalancer(config Config) (*LoadBalancer, error) {
 
 	// Set default values
 	if config.HealthCheckInterval == 0 {
-		config.HealthCheckInterval = DefaultHealthCheckInterval
+		config.HealthCheckInterval = constants.DefaultHealthCheckInterval
 	}
 	if config.HealthCheckTimeout == 0 {
-		config.HealthCheckTimeout = DefaultHealthCheckTimeout
+		config.HealthCheckTimeout = constants.DefaultHealthCheckTimeout
 	}
 
 	// Create backends
